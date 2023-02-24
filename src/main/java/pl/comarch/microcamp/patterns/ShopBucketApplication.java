@@ -1,51 +1,24 @@
 package pl.comarch.microcamp.patterns;
 
-import java.util.ArrayList;
-import java.util.stream.Collectors;
+import pl.comarch.microcamp.patterns.state.AcceptedOrderState;
 
 public class ShopBucketApplication {
 
   public static void main(String[] args) {
 
-    ArrayList<BucketItem> items = new ArrayList<>();
-    int orderStatus = 1;
+    Bucket bucket = new Bucket();
+
     String provider = "BLIK";
 
-    BucketItem e = new BucketItem();
-    e.name = "Pozycja 1";
-    e.no = 1;
-    e.price = 0.1d;
-    items.add(e);
+    bucket
+        .addPosition(new BucketItem(1, "Pozycja 1", 1, 0.1d))
+        .addPosition(new BucketItem(1, "Pozycja 2", 1, 0.2d));
 
-    BucketItem e2 = new BucketItem();
-    e2.name = "Pozycja 2";
-    e2.no = 1;
-    e2.price = 0.2d;
-    items.add(e);
+    bucket.setState(new AcceptedOrderState());
 
-    orderStatus = 2;
+    bucket.addPosition(new BucketItem(1, "Pozycja 3", 1, 0.2d));
 
-    if (orderStatus == 2) {
-      if (provider == "BLIK") {
-        System.out.println(
-            "Operacja płatności BLIK "
-                + items.stream().map(i -> i.price).collect(Collectors.summingDouble(a -> a)));
-      } else if (provider == "P24") {
-        System.out.println(
-            "Operacja płatności P24 "
-                + items.stream().map(i -> i.price).collect(Collectors.summingDouble(a -> a)));
-      }
-    } else {
-      System.out.println("Koszyk ma zły status");
-    }
-  }
-
-  private static class BucketItem {
-    int no;
-    String name;
-
-    int value;
-
-    double price;
+    bucket.pay(provider);
+    bucket.pay(provider); // płatność nie wykona się ponownie, bo zmieniony został stan
   }
 }
